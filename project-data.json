@@ -1,0 +1,15 @@
+[
+  {
+    "title": "Reddit Migrate",
+    "description": "A simple interface to migrate Reddit account data from an old account to a new account using Reddit APIs.",
+    "github": "https://github.com/nileshnk/reddit-migrate"
+  },
+  {
+    "title": "HR Bot",
+    "description": "AI-powered chatbot using LangChain and OpenAI APIs, capable of answering 90% of common HR queries without human intervention"
+  },
+  {
+    "title": "Lead Generation",
+    "description": "Lead generation application that scrapes data from different sources, transforms it, and stores it in a database. It then matches the data with ICPs provided by the client and stores the new leads in the database. Built the pipeline using Python, Kafka, and Machine Learning Models and Open AI APIs"
+  }
+]
