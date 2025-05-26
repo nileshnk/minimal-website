@@ -1,19 +1,19 @@
 import type { Metadata } from "next";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
-import ThemeProvider from "@/contexts/ThemeContext";
-import { ReactNode } from "react";
 import { Inter } from "next/font/google";
-import "./globals.css";
-
+import { ReactNode } from "react";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Portfolio - Nilesh Kumar",
-  description: "A portfolio showcasing my work, blog, and contact info.",
+  title: "Nilesh Kumar",
+  description:
+    "Web Developer - Dedicated to building responsive and user-friendly digital interfaces. Connecting creative design with efficient technical implementation.",
 };
 
-const inter = Inter({ subsets: ["latin"], weight: ["300", "400", "500"] });
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-inter",
+});
 
 interface RootLayoutProps {
   children: ReactNode;
@@ -21,15 +21,11 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <body
-        className={`${inter.className} dark:bg-black dark:text-white transition-colors`}
+        className={`${inter.variable} font-sans bg-black text-white antialiased`}
       >
-        <ThemeProvider>
-          <Navbar />
-          {children}
-          <Footer />
-        </ThemeProvider>
+        <main className="min-h-screen">{children}</main>
       </body>
     </html>
   );

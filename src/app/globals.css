@@ -2,35 +2,127 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-  /* transition: background-color 1.3s ease, color 1.3s ease; */
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #ffffff;
-    --foreground: #6b4f4f;
+    --font-inter: "Inter", sans-serif;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-black text-white;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-black;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-800 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-700;
+  }
+
+  /* Selection color */
+  ::selection {
+    @apply bg-white text-black;
+  }
+
+  /* Focus styles */
+  *:focus {
+    @apply outline-none;
+  }
+
+  /* Link styles */
+  a {
+    @apply transition-opacity hover:opacity-70;
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  transition: color 0.8s ease;
-}
+@layer components {
+  .container-width {
+    @apply max-w-3xl mx-auto px-6 md:px-8;
+  }
 
-.transition-colors {
-  transition: background-color 0.8s ease, color 0.8s ease;
-}
+  .section-spacing {
+    @apply py-16 md:py-24;
+  }
 
-.ql-syntax {
-  background-color: #2d2d2d; /* Dark background for code blocks */
-  color: #f8f8f2; /* Light text color */
-  padding: 10px; /* Add some padding */
-  border-radius: 5px; /* Rounded corners */
-  font-family: "Courier New", Courier, monospace; /* Monospace font */
-  overflow-x: auto; /* Horizontal scroll for long lines */
+  .text-muted {
+    @apply text-gray-400;
+  }
+
+  .heading-1 {
+    @apply text-4xl md:text-5xl font-light tracking-tight;
+  }
+
+  .heading-2 {
+    @apply text-2xl md:text-3xl font-light;
+  }
+
+  .body-text {
+    @apply text-base md:text-lg leading-relaxed text-gray-300;
+  }
+
+  .blog-content {
+    @apply prose prose-invert prose-lg max-w-none;
+  }
+
+  .blog-content h1 {
+    @apply text-3xl md:text-4xl font-light mt-12 mb-6;
+  }
+
+  .blog-content h2 {
+    @apply text-2xl md:text-3xl font-light mt-10 mb-4;
+  }
+
+  .blog-content h3 {
+    @apply text-xl md:text-2xl font-light mt-8 mb-3;
+  }
+
+  .blog-content p {
+    @apply mb-6 text-gray-300 leading-relaxed;
+  }
+
+  .blog-content ul,
+  .blog-content ol {
+    @apply mb-6 text-gray-300;
+  }
+
+  .blog-content li {
+    @apply mb-2;
+  }
+
+  .blog-content blockquote {
+    @apply border-l-2 border-gray-600 pl-6 italic text-gray-400 my-8;
+  }
+
+  .blog-content code {
+    @apply bg-gray-900 px-2 py-1 rounded text-sm;
+  }
+
+  .blog-content pre {
+    @apply bg-gray-900 p-4 rounded-lg overflow-x-auto my-6;
+  }
+
+  .blog-content hr {
+    @apply border-gray-800 my-12;
+  }
+
+  .blog-content a {
+    @apply text-white underline underline-offset-4 hover:opacity-70 transition-opacity;
+  }
+
+  .blog-content img {
+    @apply rounded-lg my-8;
+  }
 }
