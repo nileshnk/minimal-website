@@ -1,12 +1,27 @@
 "use client"; // Need this for useState and useEffect
 
-import { useState, useEffect } from "react";
+import githubIcon from "@iconify-icons/simple-icons/github";
+import ArrowTopRightOnSquare from "@iconify/icons-heroicons/arrow-top-right-on-square-20-solid";
+import { Icon } from "@iconify/react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import experienceData from "../../../experience-data.json";
 import projectData from "../../../project-data.json";
-export default function Projects() {
-  const [projects, setProjects] = useState<
-    Array<{ title: string; description: string; url?: string; github?: string }>
-  >([]);
-  const [expandedId, setExpandedId] = useState<number | null>(null);
+// Define Project type to match the structure in project-data.json
+type Project = {
+  title: string;
+  description: string;
+  github?: string;
+  url?: string;
+};
+
+const workExperience = experienceData;
+
+export default function ProjectsAndExperience() {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [activeTab, setActiveTab] = useState<"projects" | "experience">(
+    "projects"
+  );
 
   useEffect(() => {
     // Replace this with your actual API call
@@ -15,7 +30,7 @@ export default function Projects() {
         // const response = await fetch("/api/projects"); // Adjust the endpoint as needed
         // const data = await response.json();
 
-        setProjects(projectData);
+        setProjects(projectData as Project[]);
       } catch (error) {
         console.error("Error fetching projects:", error);
       }
@@ -24,94 +39,110 @@ export default function Projects() {
     fetchProjects();
   }, []);
 
-  const handleTitleClick = (index: number, event: React.MouseEvent) => {
-    // Only trigger if clicking the title area
-    if ((event.target as HTMLElement).closest(".title-area")) {
-      setExpandedId(expandedId === index ? null : index);
-    }
-  };
-
   return (
-    <div
-      className="w-2/6 h-screen flex items-center transition-colors"
-      style={{ marginTop: "-5%", marginLeft: "25%" }}
-    >
-      <div className="flex flex-col h-[400px]">
-        <h1 className="text-neutral-900 dark:text-[#f0f0f0] font-[480] text-[18px] leading-[24px] pb-[24px] transition-colors sticky top-0 bg-white dark:bg-black">
+    <div className="container-width min-h-screen pt-32 pb-20">
+      <h1 className="heading-1 mb-12">Work & Projects</h1>
+
+      {/* Tabs */}
+      <div className="flex space-x-6 mb-12 border-b border-gray-800">
+        <button
+          onClick={() => setActiveTab("projects")}
+          className={`pb-4 relative ${
+            activeTab === "projects"
+              ? "text-white"
+              : "text-muted hover:text-white"
+          } transition-colors`}
+        >
           Projects
-        </h1>
+          {activeTab === "projects" && (
+            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-white"></span>
+          )}
+        </button>
+        <button
+          onClick={() => setActiveTab("experience")}
+          className={`pb-4 relative ${
+            activeTab === "experience"
+              ? "text-white"
+              : "text-muted hover:text-white"
+          } transition-colors`}
+        >
+          Work Experience
+          {activeTab === "experience" && (
+            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-white"></span>
+          )}
+        </button>
+      </div>
 
-        <ul className="space-y-2 w-full overflow-y-auto">
+      {/* Projects Tab */}
+      {activeTab === "projects" && (
+        <div className="space-y-16">
           {projects.map((project, index) => (
-            <li
-              key={index}
-              className="p-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors rounded-md flex flex-col gap-y-3"
-              onClick={(e) => handleTitleClick(index, e)}
-            >
-              <h2 className="title-area cursor-pointer text-neutral-900 dark:text-[#f0f0f0] font-medium text-[16px] leading-[24px]">
-                {project.title}
-              </h2>
-
-              <div
-                className={`overflow-hidden transition-all duration-300 ease-in-out flex flex-col gap-y-2N ${
-                  expandedId === index
-                    ? "max-h-[500px] opacity-100"
-                    : "max-h-0 opacity-0"
-                }`}
-              >
-                <p
-                  className="font-[380] leading-[25px] dark:text-[#adadad] select-text text-sm"
-                  dangerouslySetInnerHTML={{ __html: project.description }}
-                />
-
-                {project?.url && (
-                  <a
-                    href={project.url}
-                    className="text-blue-500 text-sm group flex items-center gap-x-1"
-                  >
-                    Link
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={1.5}
-                      stroke="currentColor"
-                      className="group-hover:translate-x-1 transition-transform duration-300 w-3 h-3"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3"
-                      />
-                    </svg>
-                  </a>
-                )}
-                {project?.github && (
+            <div key={index} className="group">
+              <h2 className="text-2xl font-normal mb-4">{project.title}</h2>
+              <p className="text-muted max-w-3xl mb-6">{project.description}</p>
+              <div className="flex gap-6">
+                {project.github && (
                   <a
                     href={project.github}
-                    className="text-blue-500 text-sm group flex items-center gap-x-1"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-muted hover:text-white transition-colors"
                   >
-                    Github
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={1.5}
-                      stroke="currentColor"
-                      className="group-hover:translate-x-1 transition-transform duration-300 w-3 h-3"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3"
-                      />
-                    </svg>
+                    <Icon icon={githubIcon} width={18} height={18} />
+                    <span>View Code</span>
+                  </a>
+                )}
+                {project.url && (
+                  <a
+                    href={project.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-muted hover:text-white transition-colors"
+                  >
+                    <Icon icon={ArrowTopRightOnSquare} width={18} height={18} />
+                    <span>Visit Project</span>
                   </a>
                 )}
               </div>
-            </li>
+            </div>
           ))}
-        </ul>
+        </div>
+      )}
+
+      {/* Experience Tab */}
+      {activeTab === "experience" && (
+        <div className="space-y-16">
+          {workExperience.map((job, index) => (
+            <div key={index} className="group">
+              <div className="flex flex-col sm:flex-row sm:items-baseline justify-between mb-4">
+                <h2 className="text-2xl font-normal">{job.company}</h2>
+                <span className="text-muted text-sm">{job.duration}</span>
+              </div>
+              <h3 className="text-lg text-muted mb-4">{job.position}</h3>
+              <p className="text-muted max-w-3xl mb-6">{job.description}</p>
+              <div className="flex flex-wrap gap-2">
+                {job.technologies.map((tech, i) => (
+                  <span
+                    key={i}
+                    className="px-3 py-1 bg-gray-800 text-white text-xs rounded-full"
+                  >
+                    {tech}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="mt-20 text-center">
+        <Link
+          href="/resume"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors"
+        >
+          <span>View Full Resume</span>
+          <span className="text-sm">→</span>
+        </Link>
       </div>
     </div>
   );

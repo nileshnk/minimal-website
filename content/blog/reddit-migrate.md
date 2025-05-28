@@ -94,7 +94,7 @@ The tool gracefully handles various edge cases:
 Built as a single binary with embedded web assets, Reddit-Migrate runs on:
 
 - Windows (with `.exe` packaging)
-- macOS (including `.app` bundle support)
+- macOS
 - Linux distributions
 
 ## User Experience: Simplicity First

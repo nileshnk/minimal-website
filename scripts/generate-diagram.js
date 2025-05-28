@@ -1,0 +1,69 @@
+const fs = require("fs");
+const path = require("path");
+
+// Create a simple Node.js event loop diagram in SVG format
+const svgContent = `
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#000" />
+  
+  <!-- Event Loop Title -->
+  <text x="400" y="50" font-family="Arial" font-size="24" fill="#fff" text-anchor="middle">Node.js Event Loop</text>
+  
+  <!-- Main Thread -->
+  <rect x="150" y="100" width="500" height="80" rx="10" fill="#1a1a1a" stroke="#4CAF50" stroke-width="2" />
+  <text x="400" y="145" font-family="Arial" font-size="18" fill="#fff" text-anchor="middle">Main Thread (JavaScript Execution)</text>
+  
+  <!-- Event Loop Phases -->
+  <rect x="250" y="220" width="300" height="60" rx="5" fill="#1a1a1a" stroke="#2196F3" stroke-width="2" />
+  <text x="400" y="255" font-family="Arial" font-size="16" fill="#fff" text-anchor="middle">Event Loop</text>
+  
+  <!-- Event Loop Phases -->
+  <rect x="100" y="320" width="140" height="50" rx="5" fill="#1a1a1a" stroke="#FF9800" stroke-width="2" />
+  <text x="170" y="350" font-family="Arial" font-size="14" fill="#fff" text-anchor="middle">Timers</text>
+  
+  <rect x="260" y="320" width="140" height="50" rx="5" fill="#1a1a1a" stroke="#FF9800" stroke-width="2" />
+  <text x="330" y="350" font-family="Arial" font-size="14" fill="#fff" text-anchor="middle">I/O Callbacks</text>
+  
+  <rect x="420" y="320" width="140" height="50" rx="5" fill="#1a1a1a" stroke="#FF9800" stroke-width="2" />
+  <text x="490" y="350" font-family="Arial" font-size="14" fill="#fff" text-anchor="middle">Poll</text>
+  
+  <rect x="580" y="320" width="140" height="50" rx="5" fill="#1a1a1a" stroke="#FF9800" stroke-width="2" />
+  <text x="650" y="350" font-family="Arial" font-size="14" fill="#fff" text-anchor="middle">Check</text>
+  
+  <!-- Queue -->
+  <rect x="250" y="410" width="300" height="60" rx="5" fill="#1a1a1a" stroke="#F44336" stroke-width="2" />
+  <text x="400" y="445" font-family="Arial" font-size="16" fill="#fff" text-anchor="middle">Event Queue</text>
+  
+  <!-- Blocking CPU Task -->
+  <rect x="150" y="500" width="500" height="60" rx="5" fill="#1a1a1a" stroke="#E91E63" stroke-width="2" />
+  <text x="400" y="535" font-family="Arial" font-size="16" fill="#fff" text-anchor="middle">CPU-Intensive Task (Blocks Event Loop)</text>
+  
+  <!-- Arrows -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#fff" />
+    </marker>
+  </defs>
+  
+  <!-- Flow arrows -->
+  <line x1="400" y1="180" x2="400" y2="220" stroke="#fff" stroke-width="2" marker-end="url(#arrowhead)" />
+  <line x1="400" y1="280" x2="400" y2="320" stroke="#fff" stroke-width="2" marker-end="url(#arrowhead)" />
+  <line x1="400" y1="370" x2="400" y2="410" stroke="#fff" stroke-width="2" marker-end="url(#arrowhead)" />
+  <line x1="250" y1="440" x2="150" y2="440" x2="150" y2="140" stroke="#fff" stroke-width="2" marker-end="url(#arrowhead)" stroke-dasharray="5,5" />
+  
+  <!-- Blocking arrow -->
+  <line x1="400" y1="370" x2="400" y2="500" stroke="#E91E63" stroke-width="3" marker-end="url(#arrowhead)" />
+</svg>
+`;
+
+// Ensure the blog-images directory exists
+const outputDir = path.join(__dirname, "..", "public", "blog-images");
+if (!fs.existsSync(outputDir)) {
+  fs.mkdirSync(outputDir, { recursive: true });
+}
+
+// Save the SVG file
+const outputFilePath = path.join(outputDir, "nodejs-blocking.svg");
+fs.writeFileSync(outputFilePath, svgContent);
+
+console.log(`SVG diagram saved to ${outputFilePath}`);

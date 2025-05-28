@@ -1,13 +1,48 @@
 import fs from "fs";
 import matter from "gray-matter";
+import type { Root } from "hast";
 import path from "path";
 import rehypeHighlight from "rehype-highlight";
 import rehypeStringify from "rehype-stringify";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
+import { visit } from "unist-util-visit";
 
 const postsDirectory = path.join(process.cwd(), "content/blog");
+
+// Custom rehype plugin to handle mermaid code blocks
+function rehypeMermaid() {
+  return (tree: Root) => {
+    visit(tree, "element", (node) => {
+      // Check if this is a code element with mermaid class
+      if (
+        node.tagName === "pre" &&
+        node.children?.[0]?.type === "element" &&
+        (node.children[0] as any).tagName === "code" &&
+        (node.children[0] as any).properties?.className &&
+        Array.isArray((node.children[0] as any).properties.className) &&
+        (node.children[0] as any).properties.className.includes(
+          "language-mermaid"
+        )
+      ) {
+        // Get the content of the code block
+        const codeNode = node.children[0] as any;
+        const code = codeNode.children?.[0]?.value;
+
+        if (code) {
+          // Replace the pre element with a div.mermaid
+          node.tagName = "div";
+          node.properties = {
+            className: ["mermaid"],
+            "data-original": code, // Store original content for re-rendering
+          };
+          node.children = [{ type: "text", value: code }];
+        }
+      }
+    });
+  };
+}
 
 export interface BlogPost {
   slug: string;
@@ -53,7 +88,8 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
     const processedContent = await unified()
       .use(remarkParse)
       .use(remarkRehype)
-      .use(rehypeHighlight, { ignoreMissing: true })
+      .use(rehypeMermaid) // Apply custom mermaid transformation
+      .use(rehypeHighlight)
       .use(rehypeStringify)
       .process(content);
 

@@ -1,17 +1,52 @@
 "use client";
 
-import React, { useContext } from "react";
 import { ThemeContext } from "@/contexts/ThemeContext";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useContext } from "react";
 
 const Navbar = () => {
   const { darkMode, toggleDarkMode } = useContext(ThemeContext);
+  const pathname = usePathname();
+
+  const isActive = (path: string) => {
+    return pathname === path;
+  };
 
   return (
-    <nav className="p-2 px-4 flex justify-end bg-transparent">
+    <nav className="p-4 px-6 flex justify-between items-center bg-transparent fixed w-full z-10">
+      <div className="flex items-center space-x-6">
+        <Link
+          href="/"
+          className={`text-sm font-medium ${
+            isActive("/") ? "text-white" : "text-muted hover:text-white"
+          } transition-colors`}
+        >
+          Home
+        </Link>
+        <Link
+          href="/projects"
+          className={`text-sm font-medium ${
+            isActive("/projects") ? "text-white" : "text-muted hover:text-white"
+          } transition-colors`}
+        >
+          Projects
+        </Link>
+        <Link
+          href="/resume"
+          className={`text-sm font-medium ${
+            isActive("/resume") ? "text-white" : "text-muted hover:text-white"
+          } transition-colors`}
+        >
+          Resume
+        </Link>
+      </div>
+
       <button
         onClick={toggleDarkMode}
         className="p-2 bg-transparent rounded"
         id="darkModeToggleBtn"
+        aria-label="Toggle dark mode"
       >
         <svg
           className={`fill-violet-700 ${darkMode ? "hidden" : "block"}`}

@@ -9,6 +9,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+// Declare mermaid as a global type
+declare global {
+  interface Window {
+    mermaid: any;
+  }
+}
+
 interface BlogPostClientViewProps {
   post: BlogPost;
   authorName?: string; // Example: if you want to pass author name from server
@@ -18,13 +25,85 @@ interface BlogPostClientViewProps {
 export default function BlogPostClientView({
   post,
   authorName = "Nilesh Kumar",
-  authorTitle = "Web Developer",
+  authorTitle = "",
 }: BlogPostClientViewProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalImageSrc, setModalImageSrc] = useState<string | null>(null);
   const [modalImageAlt, setModalImageAlt] = useState<string | undefined>(
     undefined
   );
+
+  // Function to initialize mermaid diagrams
+  const initMermaid = () => {
+    if (typeof window !== "undefined" && window.mermaid) {
+      try {
+        window.mermaid.initialize({
+          startOnLoad: true,
+          theme: "dark",
+          securityLevel: "loose",
+          fontFamily: "inherit",
+        });
+      } catch (error) {
+        console.error("Mermaid initialization error:", error);
+      }
+    }
+  };
+
+  // Initialize mermaid when component mounts
+  useEffect(() => {
+    // Load mermaid script if not already loaded
+    if (typeof window !== "undefined" && !window.mermaid) {
+      const script = document.createElement("script");
+      script.src =
+        "https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js";
+      script.async = true;
+      script.onload = () => {
+        initMermaid();
+        // Initial render after script loads
+        setTimeout(() => {
+          try {
+            window.mermaid.init(
+              undefined,
+              document.querySelectorAll(".mermaid")
+            );
+          } catch (error) {
+            console.error("Mermaid rendering error:", error);
+          }
+        }, 100);
+      };
+      document.body.appendChild(script);
+    } else {
+      initMermaid();
+      // Initial render if mermaid is already loaded
+      setTimeout(() => {
+        try {
+          window.mermaid.init(undefined, document.querySelectorAll(".mermaid"));
+        } catch (error) {
+          console.error("Mermaid rendering error:", error);
+        }
+      }, 100);
+    }
+  }, []);
+
+  // Rerun mermaid initialization when post content changes
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.mermaid) {
+      // Clear any existing mermaid diagrams
+      const mermaidElements = document.querySelectorAll(".mermaid");
+      mermaidElements.forEach((el) => {
+        el.innerHTML = el.getAttribute("data-original") || "";
+      });
+
+      // Reinitialize mermaid
+      setTimeout(() => {
+        try {
+          window.mermaid.init(undefined, document.querySelectorAll(".mermaid"));
+        } catch (error) {
+          console.error("Mermaid rendering error:", error);
+        }
+      }, 100);
+    }
+  }, [post]);
 
   // Function to add click event listeners to images
   const attachImageClickListeners = () => {

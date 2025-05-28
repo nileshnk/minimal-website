@@ -1,0 +1,9 @@
+[
+  {
+    "company": "GeekyAnts",
+    "position": "Software Engineer",
+    "duration": "2022 - Present",
+    "description": "Building scalable and efficient systems for enterprises. Working on backend services to handle high-traffic scenarios and implementing new features.",
+    "technologies": ["Node.js", "Go", "PostgreSQL", "MySQL", "AWS"]
+  }
+]
