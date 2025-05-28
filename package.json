@@ -9,14 +9,22 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@iconify-icons/simple-icons": "^1.2.74",
+    "@iconify-icons/tabler": "^1.2.95",
+    "@iconify/react": "^6.0.0",
     "gray-matter": "^4.0.3",
-    "lucide-react": "^0.511.0",
+    "highlight.js": "^11.11.1",
     "next": "15.0.3",
     "quill": "^2.0.3",
     "react": "19.0.0-rc-66855b96-20241106",
     "react-dom": "19.0.0-rc-66855b96-20241106",
+    "rehype-highlight": "^7.0.2",
+    "rehype-stringify": "^10.0.1",
     "remark": "^15.0.1",
-    "remark-html": "^16.0.1"
+    "remark-html": "^16.0.1",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.1.2",
+    "unified": "^11.0.5"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.16",

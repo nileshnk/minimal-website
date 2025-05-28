@@ -114,6 +114,28 @@
     @apply bg-gray-900 p-4 rounded-lg overflow-x-auto my-6;
   }
 
+  /* Syntax highlighting enhancements */
+  .blog-content pre code {
+    @apply bg-transparent p-0 text-sm font-mono leading-relaxed;
+    white-space: pre;
+  }
+
+  .blog-content code.hljs {
+    @apply p-0 bg-transparent;
+  }
+
+  /* Optional: Language label for code blocks */
+  .blog-content pre {
+    position: relative;
+  }
+
+  .blog-content pre[class*="language-"]::before {
+    @apply text-xs text-gray-500 absolute top-2 right-4;
+    content: attr(class);
+    text-transform: uppercase;
+    pointer-events: none;
+  }
+
   .blog-content hr {
     @apply border-gray-800 my-12;
   }

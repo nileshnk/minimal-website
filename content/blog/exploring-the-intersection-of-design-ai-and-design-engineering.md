@@ -60,6 +60,8 @@ Modern design engineers leverage tools like:
 
 ---
 
+![Description of reddit migrate image](/blog-images/reddit-migrate.png)
+
 ## AI and Design Engineering: A Symbiotic Relationship
 
 The integration of AI into design engineering creates powerful synergies:

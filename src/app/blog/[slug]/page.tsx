@@ -1,79 +1,55 @@
-import CopyUrlButton from "@/components/CopyUrlButton";
+// This is a Server Component
+import BlogPostClientView from "@/components/BlogPostClientView";
 import { getAllPostSlugs, getPostBySlug } from "@/lib/blog";
-import { ArrowLeft } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
+// Retain generateStaticParams for SSG
 export async function generateStaticParams() {
-  return getAllPostSlugs();
+  // Assuming getAllPostSlugs is adapted to return the correct format if needed,
+  // e.g., [{ slug: 'post-1'}, { slug: 'post-2' }]
+  const slugs = await getAllPostSlugs(); // Ensure this returns what generateStaticParams expects
+  return slugs.map((s) => ({ slug: s.params.slug })); // Original was: return getAllPostSlugs(); -> Adjust if its output changed
 }
 
-export default async function BlogPost({
+// Define metadata generation function (optional, but good practice)
+export async function generateMetadata({
   params,
 }: {
   params: { slug: string };
 }) {
-  const post = await getPostBySlug(params.slug);
+  const resolvedParams = await params;
+  const slug = resolvedParams.slug;
+  const post = await getPostBySlug(slug);
+  if (!post) {
+    return {
+      title: "Post Not Found",
+    };
+  }
+  return {
+    title: post.title,
+    description: post.description, // Assuming description is part of your BlogPost type
+    // Add other metadata like openGraph images if available from post data
+    openGraph: post.imageUrl
+      ? {
+          images: [{ url: post.imageUrl }],
+        }
+      : undefined,
+  };
+}
+
+export default async function BlogPostPage({
+  params,
+}: {
+  params: { slug: string };
+}) {
+  const resolvedParams = await params;
+  const slug = resolvedParams.slug;
+  const post = await getPostBySlug(slug);
 
   if (!post) {
     notFound();
   }
 
-  return (
-    <div className="min-h-screen">
-      {/* Header */}
-      <header className="container-width pt-8 pb-16">
-        <div className="flex items-center justify-between mb-16">
-          <Link
-            href="/"
-            className="text-muted hover:text-white transition-colors"
-          >
-            <div className="flex items-center gap-2">
-              <ArrowLeft size={20} />
-              <span>Nilesh Kumar</span>
-            </div>
-          </Link>
-          <CopyUrlButton />
-        </div>
-        <p className="text-muted mb-4">Web Developer</p>
-      </header>
-
-      {/* Hero Image */}
-      {post.imageUrl && (
-        <div className="container-width mb-16">
-          <div className="relative aspect-video bg-gray-900 rounded-lg overflow-hidden">
-            <Image
-              src={post.imageUrl}
-              alt={post.title || "Blog post image"}
-              fill
-              style={{ objectFit: "cover" }}
-              priority
-            />
-          </div>
-          {post.imageCaption && (
-            <p className="text-sm text-muted mt-2 text-center">
-              {post.imageCaption}
-            </p>
-          )}
-        </div>
-      )}
-
-      {/* Article Content */}
-      <article className="container-width pb-32">
-        <h1 className="heading-1 mb-12">{post.title}</h1>
-        <div
-          className="blog-content"
-          dangerouslySetInnerHTML={{ __html: post.content }}
-        />
-      </article>
-
-      {/* Footer */}
-      <footer className="container-width pb-8 text-center">
-        <p className="text-sm text-muted">
-          © {new Date().getFullYear()} Nilesh.
-        </p>
-      </footer>
-    </div>
-  );
+  // Pass the fetched post data to the Client Component
+  return <BlogPostClientView post={post} />;
 }
