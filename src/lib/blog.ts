@@ -1,6 +1,6 @@
 import fs from "fs";
 import matter from "gray-matter";
-import type { Root } from "hast";
+import type { Root, Element, Text } from "hast";
 import path from "path";
 import rehypeHighlight from "rehype-highlight";
 import rehypeStringify from "rehype-stringify";
@@ -19,25 +19,28 @@ function rehypeMermaid() {
       if (
         node.tagName === "pre" &&
         node.children?.[0]?.type === "element" &&
-        (node.children[0] as any).tagName === "code" &&
-        (node.children[0] as any).properties?.className &&
-        Array.isArray((node.children[0] as any).properties.className) &&
-        (node.children[0] as any).properties.className.includes(
-          "language-mermaid"
-        )
+        (node.children[0] as Element).tagName === "code"
       ) {
-        // Get the content of the code block
-        const codeNode = node.children[0] as any;
-        const code = codeNode.children?.[0]?.value;
+        const codeElement = node.children[0] as Element;
+        const className = codeElement.properties?.className;
 
-        if (code) {
-          // Replace the pre element with a div.mermaid
-          node.tagName = "div";
-          node.properties = {
-            className: ["mermaid"],
-            "data-original": code, // Store original content for re-rendering
-          };
-          node.children = [{ type: "text", value: code }];
+        if (
+          className &&
+          Array.isArray(className) &&
+          className.includes("language-mermaid")
+        ) {
+          // Get the content of the code block
+          const code = (codeElement.children?.[0] as Text)?.value;
+
+          if (code) {
+            // Replace the pre element with a div.mermaid
+            node.tagName = "div";
+            node.properties = {
+              className: ["mermaid"],
+              "data-original": code, // Store original content for re-rendering
+            };
+            node.children = [{ type: "text", value: code }];
+          }
         }
       }
     });
@@ -106,7 +109,7 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
       imageCaption: data.imageCaption,
       readTime: data.readTime,
     };
-  } catch (error) {
+  } catch {
     return null;
   }
 }

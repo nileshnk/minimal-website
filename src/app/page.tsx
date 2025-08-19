@@ -45,11 +45,11 @@ export default function HomePage() {
           </Link>
         </div>
         <p className="body-text max-w-2xl">
-          Hey there! I'm a backend engineer obsessed with building systems that
-          just work—fast, reliable, and built to scale. Whether it's fintech
-          apps moving millions or healthcare systems that demand security, I
-          craft Node.js and Go solutions with performance, automation, and
-          elegance in mind.
+          Hey there! I&apos;m a backend engineer obsessed with building systems
+          that just work—fast, reliable, and built to scale. Whether it&apos;s
+          fintech apps moving millions or healthcare systems that demand
+          security, I craft Node.js and Go solutions with performance,
+          automation, and elegance in mind.
         </p>
       </section>
 

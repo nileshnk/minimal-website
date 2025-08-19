@@ -15,7 +15,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
   const resolvedParams = await params;
   const slug = resolvedParams.slug;
@@ -40,7 +40,7 @@ export async function generateMetadata({
 export default async function BlogPostPage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
   const resolvedParams = await params;
   const slug = resolvedParams.slug;

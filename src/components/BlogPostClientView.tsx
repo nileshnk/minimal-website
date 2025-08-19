@@ -12,7 +12,15 @@ import { useEffect, useState } from "react";
 // Declare mermaid as a global type
 declare global {
   interface Window {
-    mermaid: any;
+    mermaid: {
+      initialize: (config: {
+        startOnLoad?: boolean;
+        theme?: string;
+        securityLevel?: string;
+        fontFamily?: string;
+      }) => void;
+      init: (config?: undefined, elements?: NodeListOf<Element>) => void;
+    };
   }
 }
 
