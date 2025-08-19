@@ -5,37 +5,42 @@ import DocumentText from "@iconify/icons-heroicons/document-text-20-solid";
 import PrinterIcon from "@iconify/icons-heroicons/printer-20-solid";
 import { Icon } from "@iconify/react";
 import { useEffect, useState } from "react";
+import config from "../../../config.json";
+
+import { useSearchParams } from "next/navigation";
 
 export default function Resume() {
   const [resumeUrl, setResumeUrl] = useState<string>("");
+  const [resumeDownloadUrl, setResumeDownloadUrl] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     const fetchResumeUrl = async () => {
       try {
         setIsLoading(true);
-        // In a real app, you would fetch this from an API
-        // const response = await fetch("/api/resume");
-        // const data = await response.json();
-
         // For demo purposes, using a hardcoded Google Drive URL
         const data = {
-          url: "https://drive.google.com/file/d/1HAY7AcnthPmdqiHGNPv1nuGZId3n_mIl/view",
+          url: config.gDriveResumeUrl,
         };
-
-        const fileId = data.url.match(/\/d\/(.*?)\/view/)?.[1];
+        const match = data.url.match(/\/d\/(.*?)\/view/);
+        const fileId = match ? match[1] : "";
         const viewerUrl = `https://drive.google.com/file/d/${fileId}/preview?usp=sharing`;
+        const downloadUrl = `https://drive.google.com/uc?id=${fileId}&export=download`;
         setResumeUrl(viewerUrl);
+        setResumeDownloadUrl(downloadUrl);
+        // If download=true in query params, trigger download
+        if (searchParams && searchParams.get("download") === "true") {
+          window.location.href = downloadUrl;
+        }
       } catch (error) {
         console.error("Error fetching resume URL:", error);
       } finally {
         setIsLoading(false);
       }
     };
-
     fetchResumeUrl();
-  }, []);
-
+  }, [searchParams]);
   const handlePrint = () => {
     const printWindow = window.open(resumeUrl, "_blank");
     if (printWindow) {
@@ -57,9 +62,7 @@ export default function Resume() {
 
         <div className="flex gap-4">
           <a
-            href={`https://drive.google.com/uc?id=${
-              resumeUrl.match(/\/d\/(.*?)\/preview/)?.[1]
-            }&export=download`}
+            href={resumeDownloadUrl}
             download="nilesh_kumar_resume.pdf"
             className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors"
           >
