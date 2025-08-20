@@ -39,7 +39,7 @@ export default function ResumeClient() {
   const [currentVersion, setCurrentVersion] = useState<ResumeVersion>(0);
   const [error, setError] = useState<string | null>(null);
   const searchParams = useSearchParams();
-
+  console.log(resumeDownloadUrl);
   /**
    * Extract Google Drive file ID from various URL formats
    */
@@ -134,6 +134,55 @@ export default function ResumeClient() {
   };
 
   /**
+   * Download file from server with proper filename
+   */
+  const downloadFromServer = async (version: ResumeVersion) => {
+    try {
+      // Get the resume URL for this version
+      const resumeUrlResult = await getResumeUrl(version);
+
+      // Build the API endpoint URL with version and optional Google Drive URL
+      let downloadUrl = `/api/resume/download?ver=${version}`;
+
+      // If it's a Google Drive URL, pass it to the API
+      if (resumeUrlResult && !resumeUrlResult.startsWith("LOCAL_FILE:")) {
+        const encodedUrl = encodeURIComponent(resumeUrlResult);
+        downloadUrl += `&url=${encodedUrl}`;
+      }
+
+      // Fetch the file from our API
+      const response = await fetch(downloadUrl);
+
+      if (!response.ok) {
+        throw new Error("Failed to download resume");
+      }
+
+      // Get the blob from response
+      const blob = await response.blob();
+
+      // Create a temporary URL for the blob
+      const url = window.URL.createObjectURL(blob);
+
+      // Create a temporary anchor element and trigger download
+      const a = document.createElement("a");
+      a.style.display = "none";
+      a.href = url;
+      a.download = "NileshKumar_Resume.pdf";
+
+      // Append to body, click, and remove
+      document.body.appendChild(a);
+      a.click();
+
+      // Clean up
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error("Error downloading resume:", error);
+      alert("Failed to download resume. Please try again.");
+    }
+  };
+
+  /**
    * Load resume based on version
    */
   const loadResume = async (version: ResumeVersion) => {
@@ -153,6 +202,7 @@ export default function ResumeClient() {
         const fileVersion = parseInt(fileVersionStr, 10) as ResumeVersion;
         const localUrl = `/resumes/${fileVersionStr}.pdf`;
         setResumeUrl(localUrl);
+        // Store local download URL (not used directly, but kept for reference)
         setResumeDownloadUrl(localUrl);
         setCurrentResumeType(RESUME_TYPES[fileVersion] || "default");
       } else {
@@ -161,6 +211,7 @@ export default function ResumeClient() {
           const { viewerUrl, downloadUrl } =
             processGoogleDriveUrl(resumeUrlResult);
           setResumeUrl(viewerUrl);
+          // Store Google Drive download URL (not used directly, but kept for reference)
           setResumeDownloadUrl(downloadUrl);
           setCurrentResumeType(RESUME_TYPES[version]);
         } catch (urlError) {
@@ -196,11 +247,9 @@ export default function ResumeClient() {
 
       // Handle download if requested
       if (searchParams?.get("download") === "true") {
-        // Use setTimeout to ensure URLs are set before triggering download
+        // Use setTimeout to ensure everything is loaded
         setTimeout(() => {
-          if (resumeDownloadUrl) {
-            window.location.href = resumeDownloadUrl;
-          }
+          downloadFromServer(validVersion);
         }, 500);
       }
     };
@@ -208,17 +257,9 @@ export default function ResumeClient() {
     initializeResume();
   }, [searchParams]);
 
-  // Trigger download when resumeDownloadUrl is available and download is requested
-  useEffect(() => {
-    if (resumeDownloadUrl && searchParams?.get("download") === "true") {
-      // Small delay to ensure the resume is loaded
-      const timer = setTimeout(() => {
-        window.location.href = resumeDownloadUrl;
-      }, 100);
-
-      return () => clearTimeout(timer);
-    }
-  }, [resumeDownloadUrl, searchParams]);
+  const handleDirectDownload = async () => {
+    await downloadFromServer(currentVersion);
+  };
 
   const handlePrint = () => {
     if (resumeUrl.startsWith("/resumes/")) {
@@ -238,11 +279,6 @@ export default function ResumeClient() {
         });
       }
     }
-  };
-
-  const getDownloadFileName = () => {
-    // Always use "nilesh_kumar_resume.pdf" to hide the type from users
-    return "nilesh_kumar_resume.pdf";
   };
 
   // Only show version info in development or when explicitly requested
@@ -269,14 +305,13 @@ export default function ResumeClient() {
         </p>
 
         <div className="flex gap-4">
-          <a
-            href={resumeDownloadUrl}
-            download={getDownloadFileName()}
+          <button
+            onClick={handleDirectDownload}
             className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors"
           >
             <Icon icon={ArrowDownTray} width={20} height={20} />
             <span>Download</span>
-          </a>
+          </button>
 
           <button
             onClick={handlePrint}
