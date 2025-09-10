@@ -1,3 +1,5 @@
+export const runtime = "edge";
+
 // app/api/resume/view/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";

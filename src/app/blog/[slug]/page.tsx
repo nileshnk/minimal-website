@@ -1,3 +1,5 @@
+export const runtime = "edge";
+
 // This is a Server Component
 import BlogPostClientView from "@/components/BlogPostClientView";
 import { getAllPostSlugs, getPostBySlug } from "@/lib/blog";
