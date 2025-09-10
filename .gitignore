@@ -13,6 +13,10 @@
 # testing
 /coverage
 
+# cache
+.cache/
+.cache/resumes/
+
 # next.js
 /.next/
 /out/

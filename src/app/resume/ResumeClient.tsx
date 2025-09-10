@@ -3,10 +3,12 @@
 import ArrowDownTray from "@iconify/icons-heroicons/arrow-down-tray-20-solid";
 import DocumentText from "@iconify/icons-heroicons/document-text-20-solid";
 import PrinterIcon from "@iconify/icons-heroicons/printer-20-solid";
+import ArrowsPointingOut from "@iconify/icons-heroicons/arrows-pointing-out-20-solid";
 import { Icon } from "@iconify/react";
 import { useEffect, useState } from "react";
 import config from "../../../config.json";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 // Define resume types and their mappings (hidden from UI)
 const RESUME_TYPES = {
@@ -33,47 +35,11 @@ interface ConfigWithResumes {
 
 export default function ResumeClient() {
   const [resumeUrl, setResumeUrl] = useState<string>("");
-  const [resumeDownloadUrl, setResumeDownloadUrl] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [currentResumeType, setCurrentResumeType] = useState<string>("default");
   const [currentVersion, setCurrentVersion] = useState<ResumeVersion>(0);
   const [error, setError] = useState<string | null>(null);
   const searchParams = useSearchParams();
-  console.log(resumeDownloadUrl);
-  /**
-   * Extract Google Drive file ID from various URL formats
-   */
-  const extractGoogleDriveFileId = (url: string): string | null => {
-    const patterns = [
-      /\/d\/(.*?)\/view/,
-      /\/d\/(.*?)$/,
-      /id=(.*?)(&|$)/,
-      /\/file\/d\/(.*?)\//,
-    ];
-
-    for (const pattern of patterns) {
-      const match = url.match(pattern);
-      if (match && match[1]) {
-        return match[1];
-      }
-    }
-    return null;
-  };
-
-  /**
-   * Convert Google Drive URL to preview and download URLs
-   */
-  const processGoogleDriveUrl = (url: string) => {
-    const fileId = extractGoogleDriveFileId(url);
-    if (!fileId) {
-      throw new Error("Invalid Google Drive URL format");
-    }
-
-    return {
-      viewerUrl: `https://drive.google.com/file/d/${fileId}/preview?usp=sharing`,
-      downloadUrl: `https://drive.google.com/uc?id=${fileId}&export=download`,
-    };
-  };
 
   /**
    * Check if a local resume file exists
@@ -196,30 +162,26 @@ export default function ResumeClient() {
         throw new Error("No resume URL available");
       }
 
-      // Handle local file
+      // Determine the URL to use for displaying the PDF
+      let displayUrl: string;
+
       if (resumeUrlResult.startsWith("LOCAL_FILE:")) {
+        // For local files, serve directly
         const fileVersionStr = resumeUrlResult.split(":")[1];
-        const fileVersion = parseInt(fileVersionStr, 10) as ResumeVersion;
-        const localUrl = `/resumes/${fileVersionStr}.pdf`;
-        setResumeUrl(localUrl);
-        // Store local download URL (not used directly, but kept for reference)
-        setResumeDownloadUrl(localUrl);
-        setCurrentResumeType(RESUME_TYPES[fileVersion] || "default");
+        displayUrl = `/resumes/${fileVersionStr}.pdf`;
+        setCurrentResumeType(
+          RESUME_TYPES[parseInt(fileVersionStr, 10) as ResumeVersion] ||
+            "default"
+        );
       } else {
-        // Handle Google Drive URL
-        try {
-          const { viewerUrl, downloadUrl } =
-            processGoogleDriveUrl(resumeUrlResult);
-          setResumeUrl(viewerUrl);
-          // Store Google Drive download URL (not used directly, but kept for reference)
-          setResumeDownloadUrl(downloadUrl);
-          setCurrentResumeType(RESUME_TYPES[version]);
-        } catch (urlError) {
-          console.error("Error processing Google Drive URL:", urlError);
-          throw new Error("Invalid Google Drive URL format");
-        }
+        // For Google Drive URLs, use our API to fetch and serve the PDF
+        const encodedUrl = encodeURIComponent(resumeUrlResult);
+        displayUrl = `/api/resume/view?ver=${version}&url=${encodedUrl}`;
+        setCurrentResumeType(RESUME_TYPES[version]);
       }
 
+      // Set the URL for display (always served through our server)
+      setResumeUrl(displayUrl);
       setCurrentVersion(version);
     } catch (error) {
       console.error("Error loading resume:", error);
@@ -262,23 +224,20 @@ export default function ResumeClient() {
   };
 
   const handlePrint = () => {
-    if (resumeUrl.startsWith("/resumes/")) {
-      // For local files, open in new window then print
-      const printWindow = window.open(resumeUrl, "_blank");
-      if (printWindow) {
-        printWindow.addEventListener("load", () => {
-          setTimeout(() => printWindow.print(), 500);
-        });
-      }
-    } else {
-      // For Google Drive files
-      const printWindow = window.open(resumeUrl, "_blank");
-      if (printWindow) {
-        printWindow.addEventListener("load", () => {
-          printWindow.print();
-        });
-      }
+    // Always use the viewer URL for printing
+    const viewerUrl = `/resume/viewer?ver=${currentVersion}`;
+    const printWindow = window.open(viewerUrl, "_blank");
+    if (printWindow) {
+      printWindow.addEventListener("load", () => {
+        setTimeout(() => printWindow.print(), 500);
+      });
     }
+  };
+
+  const handlePopout = () => {
+    // Open resume in new tab using site's own viewer
+    const viewerUrl = `/resume/viewer?ver=${currentVersion}`;
+    window.open(viewerUrl, "_blank");
   };
 
   // Only show version info in development or when explicitly requested
@@ -288,6 +247,17 @@ export default function ResumeClient() {
 
   return (
     <div className="container-width min-h-screen pt-32 pb-20">
+      {/* Back button */}
+      <div className="mb-8">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-muted hover:text-white transition-colors"
+        >
+          <span className="text-sm">←</span>
+          <span>Back to home</span>
+        </Link>
+      </div>
+
       <div className="flex items-center gap-4 mb-8">
         <h1 className="heading-1">Resume</h1>
         {/* Only show version badge in development or debug mode */}
@@ -314,11 +284,12 @@ export default function ResumeClient() {
           </button>
 
           <button
-            onClick={handlePrint}
+            onClick={handlePopout}
             className="flex items-center gap-2 px-4 py-2 bg-transparent border border-gray-700 text-white rounded-md hover:bg-gray-800 transition-colors"
+            title="Open in new tab"
           >
-            <Icon icon={PrinterIcon} width={20} height={20} />
-            <span>Print</span>
+            <Icon icon={ArrowsPointingOut} width={20} height={20} />
+            <span className="hidden sm:inline">Open</span>
           </button>
         </div>
       </div>
@@ -381,21 +352,12 @@ export default function ResumeClient() {
               </p>
             )}
           </div>
-        ) : resumeUrl.startsWith("/resumes/") ? (
-          // Local PDF file
+        ) : (
+          // Always use iframe/embed for consistent display
           <embed
-            src={resumeUrl}
+            src={getPdfUrlWithParams(resumeUrl)}
             type="application/pdf"
             className="w-full h-[calc(100vh-300px)] min-h-[800px]"
-            title="Resume"
-          />
-        ) : (
-          // Google Drive iframe
-          <iframe
-            src={resumeUrl}
-            className="w-full h-[calc(100vh-300px)] min-h-[800px]"
-            frameBorder="0"
-            allowFullScreen
             title="Resume"
           />
         )}
@@ -414,3 +376,25 @@ export default function ResumeClient() {
     </div>
   );
 }
+// Add PDF parameters to control the display
+const getPdfUrlWithParams = (baseUrl: any) => {
+  const params = new URLSearchParams({
+    // Hide the toolbar and navigation
+    toolbar: "1", // Hide toolbar
+    navpanes: "0", // Hide navigation panes (left sidebar)
+    scrollbar: "0", // Hide scrollbar (optional)
+
+    // Fit and zoom options
+    view: "FitH", // Fit horizontally (full width)
+    // Alternative options:
+    // 'view': 'FitV',       // Fit vertically (full height)
+    // 'view': 'FitB',       // Fit bounding box
+    // 'zoom': '100',        // Set specific zoom percentage
+
+    // Page display
+    page: "1", // Start at page 1
+    pagemode: "none", // No sidebar/thumbnails
+  });
+
+  return `${baseUrl}#${params.toString()}`;
+};

@@ -1,4 +1,4 @@
-// app/api/resume/download/route.ts
+// app/api/resume/view/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
@@ -48,7 +48,6 @@ function getCacheDir(): string {
  * Get cached file path for a Google Drive URL
  */
 function getCachedFilePath(url: string): string {
-  // Create a hash of the URL to use as filename
   const hash = crypto.createHash("md5").update(url).digest("hex");
   return path.join(getCacheDir(), `${hash}.pdf`);
 }
@@ -79,14 +78,13 @@ async function getCachedFile(url: string): Promise<Buffer | null> {
     const maxAge = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
 
     if (cacheAge > maxAge) {
-      console.log("Cache expired for:", url);
+      console.log("Cache expired for view:", url);
       return null;
     }
 
-    console.log("Serving from cache:", cachedPath);
+    console.log("Serving view from cache:", cachedPath);
     return await fs.readFile(cachedPath);
   } catch (error) {
-    // File doesn't exist or can't be read
     return null;
   }
 }
@@ -100,7 +98,7 @@ async function saveToCache(url: string, buffer: Buffer): Promise<void> {
 
   try {
     await fs.writeFile(cachedPath, buffer);
-    console.log("Saved to cache:", cachedPath);
+    console.log("Saved to cache for view:", cachedPath);
   } catch (error) {
     console.error("Error saving to cache:", error);
   }
@@ -121,11 +119,10 @@ async function downloadFromGoogleDrive(url: string): Promise<Buffer> {
     throw new Error("Invalid Google Drive URL format");
   }
 
-  // Use Google Drive direct download URL
   const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
 
   try {
-    console.log("Downloading from Google Drive:", fileId);
+    console.log("Downloading from Google Drive for view:", fileId);
     const response = await fetch(downloadUrl, {
       headers: {
         "User-Agent":
@@ -211,7 +208,7 @@ export async function GET(request: NextRequest) {
         fileBuffer = await downloadFromGoogleDrive(decodedUrl);
       } catch (gdError) {
         console.error(
-          "Google Drive download failed, trying local fallback:",
+          "Google Drive download failed for view, trying local fallback:",
           gdError
         );
 
@@ -226,10 +223,7 @@ export async function GET(request: NextRequest) {
             fileBuffer = defaultBuffer;
           } else {
             return NextResponse.json(
-              {
-                error:
-                  "Resume file not found (Google Drive failed, no local fallback)",
-              },
+              { error: "Resume file not found" },
               { status: 404 }
             );
           }
@@ -265,77 +259,33 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Use the native Response object for binary data to avoid issues with NextResponse
+    // Create response with inline viewing headers (not download)
+    // const response = new NextResponse(fileBuffer, {
+    //   status: 200,
+    //   headers: {
+    //     "Content-Type": "application/pdf",
+    //     "Content-Disposition": 'inline; filename="NileshKumar_Resume.pdf"', // inline instead of attachment
+    //     "Content-Length": fileBuffer.length.toString(),
+    //     "Cache-Control": "public, max-age=3600", // Cache for 1 hour on client
+    //   },
+    // });
+
     return new Response(new Uint8Array(fileBuffer), {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": 'attachment; filename="NileshKumar_Resume.pdf"',
+        "Content-Disposition": 'inline; filename="NileshKumar_Resume.pdf"',
         "Content-Length": fileBuffer.length.toString(),
         "Cache-Control": "public, max-age=3600", // Cache for 1 hour on client
       },
     });
+
+    // return response;
   } catch (error) {
-    console.error("Error serving resume:", error);
+    console.error("Error serving resume for view:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
     );
-  }
-}
-
-// Optional: Add HEAD method for checking file existence
-export async function HEAD(request: NextRequest) {
-  try {
-    const searchParams = request.nextUrl.searchParams;
-    const versionParam = searchParams.get("ver");
-    const urlParam = searchParams.get("url");
-    const version = (
-      versionParam ? parseInt(versionParam, 10) : 0
-    ) as ResumeVersion;
-    const validVersion = version in RESUME_TYPES ? version : 0;
-
-    // If URL is provided, check cache or assume it exists
-    if (urlParam) {
-      const decodedUrl = decodeURIComponent(urlParam);
-      const cachedBuffer = await getCachedFile(decodedUrl);
-
-      if (cachedBuffer) {
-        return new NextResponse(null, {
-          status: 200,
-          headers: {
-            "Content-Type": "application/pdf",
-            "X-Cache": "HIT",
-          },
-        });
-      }
-
-      // Assume it exists if not in cache
-      return new NextResponse(null, {
-        status: 200,
-        headers: {
-          "Content-Type": "application/pdf",
-          "X-Cache": "MISS",
-        },
-      });
-    }
-
-    // Check local file
-    const resumePath = path.join(
-      process.cwd(),
-      "public",
-      "resumes",
-      `${validVersion}.pdf`
-    );
-    await fs.access(resumePath);
-
-    return new NextResponse(null, {
-      status: 200,
-      headers: {
-        "Content-Type": "application/pdf",
-      },
-    });
-  } catch (error) {
-    return new NextResponse(null, { status: 404 });
   }
 }

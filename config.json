@@ -1,13 +1,13 @@
 {
-  "gDriveResumeUrl": "https://drive.google.com/file/d/1HAY7AcnthPmdqiHGNPv1nuGZId3n_mIl/view",
+  "gDriveResumeUrl": "https://drive.google.com/file/d/1hlYGWU4qR23M-6HK87x-aQZU4nZJCdMk/view",
   "resumes": {
     "0": {
       "type": "default",
-      "url": "https://drive.google.com/file/d/1HAY7AcnthPmdqiHGNPv1nuGZId3n_mIl/view"
+      "url": "https://drive.google.com/file/d/1hlYGWU4qR23M-6HK87x-aQZU4nZJCdMk/view"
     },
     "1": {
       "type": "NodeJS",
-      "url": "https://drive.google.com/file/d/1hlYGWU4qR23M-6HK87x-aQZU4nZJCdMk/view"
+      "url": "https://drive.google.com/file/d/1HAY7AcnthPmdqiHGNPv1nuGZId3n_mIl/view"
     },
     "2": {
       "type": "Golang",
