@@ -87,6 +87,7 @@ async function getCachedFile(url: string): Promise<Buffer | null> {
     return await fs.readFile(cachedPath);
   } catch (error) {
     // File doesn't exist or can't be read
+    console.log(error);
     return null;
   }
 }
@@ -186,6 +187,7 @@ async function loadLocalResume(version: ResumeVersion): Promise<Buffer | null> {
     const fileBuffer = await fs.readFile(resumePath);
     return fileBuffer;
   } catch (error) {
+    console.log(error);
     return null;
   }
 }
@@ -336,6 +338,7 @@ export async function HEAD(request: NextRequest) {
       },
     });
   } catch (error) {
+    console.log(error);
     return new NextResponse(null, { status: 404 });
   }
 }

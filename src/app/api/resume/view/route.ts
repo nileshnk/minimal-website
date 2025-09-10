@@ -85,6 +85,7 @@ async function getCachedFile(url: string): Promise<Buffer | null> {
     console.log("Serving view from cache:", cachedPath);
     return await fs.readFile(cachedPath);
   } catch (error) {
+    console.log(error);
     return null;
   }
 }
@@ -183,6 +184,7 @@ async function loadLocalResume(version: ResumeVersion): Promise<Buffer | null> {
     const fileBuffer = await fs.readFile(resumePath);
     return fileBuffer;
   } catch (error) {
+    console.log(error);
     return null;
   }
 }

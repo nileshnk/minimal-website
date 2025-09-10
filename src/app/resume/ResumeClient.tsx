@@ -2,7 +2,6 @@
 
 import ArrowDownTray from "@iconify/icons-heroicons/arrow-down-tray-20-solid";
 import DocumentText from "@iconify/icons-heroicons/document-text-20-solid";
-import PrinterIcon from "@iconify/icons-heroicons/printer-20-solid";
 import ArrowsPointingOut from "@iconify/icons-heroicons/arrows-pointing-out-20-solid";
 import { Icon } from "@iconify/react";
 import { useEffect, useState } from "react";
@@ -223,6 +222,7 @@ export default function ResumeClient() {
     await downloadFromServer(currentVersion);
   };
 
+  /**
   const handlePrint = () => {
     // Always use the viewer URL for printing
     const viewerUrl = `/resume/viewer?ver=${currentVersion}`;
@@ -233,6 +233,7 @@ export default function ResumeClient() {
       });
     }
   };
+   */
 
   const handlePopout = () => {
     // Open resume in new tab using site's own viewer
@@ -377,7 +378,7 @@ export default function ResumeClient() {
   );
 }
 // Add PDF parameters to control the display
-const getPdfUrlWithParams = (baseUrl: any) => {
+const getPdfUrlWithParams = (baseUrl: string) => {
   const params = new URLSearchParams({
     // Hide the toolbar and navigation
     toolbar: "1", // Hide toolbar
