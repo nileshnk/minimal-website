@@ -1,17 +1,17 @@
-export const runtime = "edge";
+// export const runtime = "edge";
 
 // This is a Server Component
 import BlogPostClientView from "@/components/BlogPostClientView";
-import { getPostBySlug } from "@/lib/blog";
+import { getPostBySlug, getAllPostSlugs } from "@/lib/blog";
 import { notFound } from "next/navigation";
 
 // Retain generateStaticParams for SSG
-// export async function generateStaticParams() {
-//   // Assuming getAllPostSlugs is adapted to return the correct format if needed,
-//   // e.g., [{ slug: 'post-1'}, { slug: 'post-2' }]
-//   const slugs = await getAllPostSlugs(); // Ensure this returns what generateStaticParams expects
-//   return slugs.map((s) => ({ slug: s.params.slug })); // Original was: return getAllPostSlugs(); -> Adjust if its output changed
-// }
+export function generateStaticParams() {
+  // Assuming getAllPostSlugs is adapted to return the correct format if needed,
+  // e.g., [{ slug: 'post-1'}, { slug: 'post-2' }]
+  const slugs = getAllPostSlugs(); // Ensure this returns what generateStaticParams expects
+  return slugs.map((s) => ({ slug: s.params.slug })); // Original was: return getAllPostSlugs(); -> Adjust if its output changed
+}
 
 // Define metadata generation function (optional, but good practice)
 export async function generateMetadata({

@@ -1,10 +1,10 @@
-export const runtime = "edge";
+// export const runtime = "edge";
 
 // app/api/resume/download/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs/promises";
-import path from "path";
-import crypto from "crypto";
+import * as fs from "fs/promises";
+import * as path from "path";
+import * as crypto from "crypto";
 
 // Define resume types
 const RESUME_TYPES = {
