@@ -48,8 +48,8 @@ export default function HomePage() {
           Hey there! I&apos;m a backend engineer obsessed with building systems
           that just work—fast, reliable, and built to scale. Whether it&apos;s
           fintech apps moving millions or healthcare systems that demand
-          security, I craft Node.js and Go solutions with performance,
-          automation, and elegance in mind.
+          security, I craft language agnostic solutions with performance,
+          automation, and maintainability in mind.
         </p>
       </section>
 
