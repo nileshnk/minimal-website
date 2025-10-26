@@ -1,10 +1,10 @@
 // export const runtime = "edge";
 
 // app/api/resume/download/route.ts
-import { NextRequest, NextResponse } from "next/server";
-import * as fs from "fs/promises";
-import * as path from "path";
 import * as crypto from "crypto";
+import * as fs from "fs/promises";
+import { NextRequest, NextResponse } from "next/server";
+import * as path from "path";
 
 // Define resume types
 const RESUME_TYPES = {
@@ -14,7 +14,8 @@ const RESUME_TYPES = {
   3: "Java",
   4: "Python",
   5: "GenAI",
-  6: "Mixed",
+  6: "Platform",
+  7: "Mixed",
 } as const;
 
 type ResumeVersion = keyof typeof RESUME_TYPES;

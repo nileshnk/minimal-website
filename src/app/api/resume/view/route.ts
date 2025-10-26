@@ -1,8 +1,8 @@
 // app/api/resume/view/route.ts
-import { NextRequest, NextResponse } from "next/server";
-import fs from "fs/promises";
-import path from "path";
 import crypto from "crypto";
+import fs from "fs/promises";
+import { NextRequest, NextResponse } from "next/server";
+import path from "path";
 
 // Define resume types
 const RESUME_TYPES = {
@@ -12,7 +12,8 @@ const RESUME_TYPES = {
   3: "Java",
   4: "Python",
   5: "GenAI",
-  6: "Mixed",
+  6: "Platform",
+  7: "Mixed",
 } as const;
 
 type ResumeVersion = keyof typeof RESUME_TYPES;

@@ -1,13 +1,13 @@
 "use client";
 
 import ArrowDownTray from "@iconify/icons-heroicons/arrow-down-tray-20-solid";
-import DocumentText from "@iconify/icons-heroicons/document-text-20-solid";
 import ArrowsPointingOut from "@iconify/icons-heroicons/arrows-pointing-out-20-solid";
+import DocumentText from "@iconify/icons-heroicons/document-text-20-solid";
 import { Icon } from "@iconify/react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import config from "../../../config.json";
-import { useSearchParams } from "next/navigation";
-import Link from "next/link";
 
 // Define resume types and their mappings (hidden from UI)
 const RESUME_TYPES = {
@@ -17,7 +17,8 @@ const RESUME_TYPES = {
   3: "Java",
   4: "Python",
   5: "GenAI",
-  6: "Mixed",
+  6: "Platform",
+  7: "Mixed",
 } as const;
 
 type ResumeVersion = keyof typeof RESUME_TYPES;
